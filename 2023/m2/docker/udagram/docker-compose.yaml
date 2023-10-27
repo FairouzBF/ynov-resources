@@ -1,0 +1,56 @@
+version: "3"
+services:
+  reverseproxy:
+    build:
+      context: ./udagram-reverseproxy
+    image: reverseproxy
+    depends_on:
+      - db-container
+      - backend-user
+      - backend-feed
+    ports:
+      - 8080:8080
+  udagram-front:
+    image: pasciano007/udagram-frontend
+    ports:
+      - 8200:80
+  backend-user:
+    build:
+      context: ./udagram-api-user
+    image: udagram-api-user
+    depends_on:
+      - db-container
+    environment:
+      POSTGRES_USERNAME: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      AWS_BUCKET: ${AWS_BUCKET}
+      AWS_REGION: ${AWS_REGION}
+      AWS_PROFILE: ${AWS_PROFILE}
+      JWT_SECRET: ${JWT_SECRET}
+      URL: ${URL}
+  backend-feed:
+    build:
+      context: ./udagram-api-feed
+    image: udagram-api-feed
+    depends_on:
+      - db-container
+    environment:
+      POSTGRES_USERNAME: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      AWS_BUCKET: ${AWS_BUCKET}
+      AWS_REGION: ${AWS_REGION}
+      AWS_PROFILE: ${AWS_PROFILE}
+      JWT_SECRET: ${JWT_SECRET}
+      URL: ${URL}
+  db-container:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
