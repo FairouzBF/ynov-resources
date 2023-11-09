@@ -42,8 +42,8 @@ sudo docker tag who-rule-the-world-vote fairouzbf/who-rule-the-world-vote
 sudo docker tag who-rule-the-world-seed-data fairouzbf/who-rule-the-world-seed-data
 ```
 ![Tag](tag.png)
-![Public](public.png)
 ![Publish](publish.png)
+![Public](public.png)
 
 5. Write the compose.yml file:
 ```
