@@ -1,8 +1,31 @@
-# SUBMISSION : Who Rule The World app? CATs or DOGs ?
+# SUBMISSION : Docker Evaluation
 
-## Tasks
+BEN FRAJ Fairouz / BOURAS Nadia / GEORGES Elodie
+
+
+## Sommaire
+
+ - [Introduction](#introduction)
+ - [VM Connection](#vm-connection)
+ - [Creating images](#creating-images)
+ - [Containers](#containers)
+ - [Results](#results)
+ - [Conclusion](#conclusion)
+
+## Introduction
+
+We are going to set up a voting application with real-time results display. This application includes several microservices that will be hosted on our virtual machine and accessible from our local machine. Each service will use a Docker container. All these containers will run on our virtual machine.
+
+## VM Connection
+
+We will connect to the virtual machine using the SSH function as we did in the previous assessment.
+
+## Creating images
+
 1. Fork the repository
+
 2. Create Dockerfiles for each containers, worker, vote, seed-data and result.
+
 3. At the root create the docker-compose.build.yml file: 
 ```
 version: '3' 
@@ -33,19 +56,38 @@ networks:
 		external: true
 ```
 ![Docker compose build file](docker-compose-build.png)
-4. Tag and publish on my public registry:
 
+4. Tag and publish on my public registry:
 ```
 sudo docker tag who-rule-the-world-worker fairouzbf/who-rule-the-world-worker
 sudo docker tag who-rule-the-world-result fairouzbf/who-rule-the-world-result
 sudo docker tag who-rule-the-world-vote fairouzbf/who-rule-the-world-vote
 sudo docker tag who-rule-the-world-seed-data fairouzbf/who-rule-the-world-seed-data
-```
-![Tag](tag.png)
-![Publish](publish.png)
-![Public](public.png)
 
-5. Write the compose.yml file:
+sudo docker push fairouzbf/who-rule-the-world-worker
+sudo docker push fairouzbf/who-rule-the-world-worker
+sudo docker push fairouzbf/who-rule-the-world-worker
+sudo docker push fairouzbf/who-rule-the-world-worker
+```
+
+5. Tag and publish on my private registry:
+```
+sudo docker tag who-rule-the-world-worker localhost:5000/who-rule-the-world-worker
+sudo docker tag who-rule-the-world-result localhost:5000/who-rule-the-world-result
+sudo docker tag who-rule-the-world-vote localhost:5000/who-rule-the-world-vote
+sudo docker tag who-rule-the-world-seed-data localhost:5000/who-rule-the-world-seed-data
+
+sudo docker push localhost:5000/who-rule-the-world-worker
+sudo docker push localhost:5000/who-rule-the-world-result
+sudo docker push localhost:5000/who-rule-the-world-vote
+sudo docker push localhost:5000/who-rule-the-world-seed-data
+```
+
+![Tag](tag.png)
+![Public](public.png)
+![Publish](publish.png)
+
+6. Write the compose.yml file:
 ```
 services:
 	worker:
@@ -132,3 +174,5 @@ networks:
 volumes:
   db-data:
 ```
+
+## Containers
