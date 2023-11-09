@@ -70,6 +70,10 @@ sudo docker push fairouzbf/who-rule-the-world-worker
 sudo docker push fairouzbf/who-rule-the-world-worker
 ```
 
+![Tag](tag.png)
+![Public](public.png)
+![Publish](publish.png)
+
 5. Tag and publish on my private registry:
 ```
 sudo docker tag who-rule-the-world-worker localhost:5000/who-rule-the-world-worker
@@ -83,66 +87,66 @@ sudo docker push localhost:5000/who-rule-the-world-vote
 sudo docker push localhost:5000/who-rule-the-world-seed-data
 ```
 
-![Tag](tag.png)
-![Public](public.png)
-![Publish](publish.png)
+![Private](private.png)
+![Private publish](private-publish.png)
 
-6. Write the compose.yml file:
+## Containers
+
+### Write the compose.yml file:
 ```
 services:
-	worker:
-		image: localhost:5000/worker
-		depends_on:
-			redis:
-				condition: service_healthy
-			db:
-				condition: service_healthy
-		networks:
-			- back-tier
+  worker:
+    image: localhost:5000/who-rule-the-world-worker
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - back-tier
 
-	vote:
-		image: localhost:5000/vote
-		ports:
-			- "5002:80"
-		networks:
-			- front-tier
-			- back-tier
-		healthcheck:
-			test: ["CMD", "curl", "-f", "http://localhost"]
-			interval: 15s
-			timeout: 5s
-			retries: 3
-			start_period: 10s
-		volumes:
+  vote:
+    image: localhost:5000/who-rule-the-world-vote
+    ports:
+      - "5002:80"
+    networks:
+      - front-tier
+      - back-tier
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
       - ./vote:/usr/local/app
-	
-	seed-data:
-    image: localhost:5000/seed-data
+
+  seed-data:
+    image: localhost:5000/who-rule-the-world-seed-data
     profiles: ["seed"]
     depends_on:
       vote:
         condition: service_healthy
     restart: "no"
-    networks: 
+    networks:
       - front-tier
 
-	result:
-		image: localhost:5000/result
-		volumes:
-			- ./result:/usr/local/app
-		ports:
-			- "5001:80"
-			- "127.0.0.1:9229:9229"
-		networks:
-			- back-tier
-		entrypoint: nodemon --inspect=0.0.0.0 server.js
-		depends_on:
-			db:
+  result:
+    image: localhost:5000/who-rule-the-world-result
+    volumes:
+      - ./result:/usr/local/app
+    ports:
+      - "5001:80"
+      - "127.0.0.1:9229:9229"
+    networks:
+      - back-tier
+    entrypoint: nodemon --inspect=0.0.0.0 server.js
+    depends_on:
+      db:
         condition: service_healthy
-	
-	  db:
+  db:
     image: postgres:15-alpine
-    networks: 
+    networks:
       - back-tier
     volumes:
       - "db-data:/var/lib/postgresql/data"
@@ -156,23 +160,36 @@ services:
       POSTGRES_DB: "postgres"
     ports:
       - 5432:5432
-    
+
   redis:
     image: redis
     volumes:
       - "./healthchecks:/healthchecks"
-    networks: 
+    networks:
       - back-tier
     healthcheck:
       test: /healthchecks/redis.sh
       interval: "5s"
 
 networks:
-	front-tier:
-	back-tier:
+  front-tier:
+  back-tier:
 
 volumes:
   db-data:
 ```
+### Use docker compose command
+![Compose](compose.png)
 
-## Containers
+## Results
+### Port Forwarding
+We set up the port forwarding to access ports 5000 & 5001 from our local machine and configure these settings on VirtualBox in our VM's parameters.
+
+### Screenshot of the results
+![Result](result.png)
+
+## Conclusion
+
+We set up two applications with services that are interconnected. We exposed them on our local machine, and we can access these applications via the URL: localhost:5000 or localhost:5001 for the results.
+
+We used Docker Compose to quickly create multiple containers simultaneously. Moreover, these microservices run on the virtual machine and are accessible from the local machine.
